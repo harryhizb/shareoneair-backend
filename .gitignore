@@ -1,0 +1,32 @@
+# Node modules
+node_modules/
+
+# Environment files
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploaded files (optional - if you don't want to track them in Git)
+uploads/
+
+# Database file (optional)
+shareonair.db
+
+# Vercel output and config (optional)
+.vercel/
+output/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
