@@ -72,7 +72,7 @@ const cleanupExpiredShares = async () => {
 setInterval(cleanupExpiredShares, 60 * 60 * 1000);
 
 // Routes
-app.get('/api/health', (req, res) => {
+app.get('/', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
