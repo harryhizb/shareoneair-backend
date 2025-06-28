@@ -15,25 +15,25 @@ const shareSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: function() {
+    required: function () {
       return this.type === 'text';
     }
   },
   filePath: {
     type: String,
-    required: function() {
+    required: function () {
       return this.type === 'file';
     }
   },
   fileName: {
     type: String,
-    required: function() {
+    required: function () {
       return this.type === 'file';
     }
   },
   fileSize: {
     type: Number,
-    required: function() {
+    required: function () {
       return this.type === 'file';
     }
   },
@@ -47,46 +47,44 @@ const shareSchema = new mongoose.Schema({
   },
   expiresAt: {
     type: Date,
-    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-    index: { expireAfterSeconds: 0 }
+    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    index: { expireAfterSeconds: 0 } // ✅ This already creates the index
   }
 }, {
   timestamps: true
 });
 
-// Index for efficient queries
-shareSchema.index({ code: 1 });
-shareSchema.index({ expiresAt: 1 });
-shareSchema.index({ type: 1 });
+// ✅ Only keep unique/important indexes
+shareSchema.index({ code: 1 }); // keep this
+shareSchema.index({ type: 1 }); // optional: for faster queries by type
 
-// Virtual for checking if expired
-shareSchema.virtual('isExpired').get(function() {
+// 🚫 Removed duplicate `expiresAt` index
+
+// Virtuals
+shareSchema.virtual('isExpired').get(function () {
   return this.expiresAt < new Date();
 });
 
-// Virtual for checking if max views reached
-shareSchema.virtual('isMaxViewsReached').get(function() {
+shareSchema.virtual('isMaxViewsReached').get(function () {
   return this.views >= this.maxViews;
 });
 
-// Method to increment views
-shareSchema.methods.incrementViews = function() {
+// Methods
+shareSchema.methods.incrementViews = function () {
   this.views += 1;
   return this.save();
 };
 
-// Static method to find by code
-shareSchema.statics.findByCode = function(code) {
+shareSchema.statics.findByCode = function (code) {
   return this.findOne({ code: code.toUpperCase() });
 };
 
-// Static method to cleanup expired shares
-shareSchema.statics.cleanupExpired = function() {
+shareSchema.statics.cleanupExpired = function () {
   return this.deleteMany({ expiresAt: { $lt: new Date() } });
 };
 
-// Pre-save middleware to ensure code is uppercase
-shareSchema.pre('save', function(next) {
+// Middleware
+shareSchema.pre('save', function (next) {
   if (this.code) {
     this.code = this.code.toUpperCase();
   }
